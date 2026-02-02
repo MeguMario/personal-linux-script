@@ -1,0 +1,223 @@
+#!/bin/bash
+
+kernel_check() {
+	REPO_DIR="${HOME}/cachyos_repo/cachyos-repo/pacman.conf"
+	
+	# Sync database
+	paru -Sy --config $REPO_DIR --noconfirm > /dev/null 2>&1;
+	
+	# Check for the latest tag
+	REMOTE_VER=$(pacman -Ss linux-cachyos --config $REPO_DIR | grep -m 1 -Eo '[0-9]+.[0-9]+.[0-9]+-[0-9]')
+	CURRENT_VER=$(pacman -Q linux-cachyos | sed -n -e 's/^.*linux-cachyos //p')
+
+	if [[ "$CURRENT_VER" < "$REMOTE_VER" ]]; then
+	    # echo "linux-cachyos version ${REMOTE_VER} found, updating"
+
+	    echo Updating Kernel
+	    paru -S linux-cachyos linux-cachyos-headers --config $REPO_DIR --noconfirm 
+
+	    # echo "linux-cachyos version ${REMOTE_VER} is updated"
+	else
+	    echo "linux-cachyos version ${CURRENT_VER} is up to date"
+	fi
+}
+
+android_image_check() {
+	REPO_DIR="${HOME}/cachyos_repo/cachyos-repo/pacman.conf"
+	
+	# Sync database
+-	paru -Sy --config $REPO_DIR --noconfirm > /dev/null 2>&1;
+	
+	# Check for the latest tag
+	REMOTE_VER=$(pacman -Ss waydroid-image --config $REPO_DIR | grep -m 1 -Eo '[0-9]+.[0-9]+.[0-9]+-[0-9]')
+	CURRENT_VER=$(pacman -Q waydroid-image | sed -n -e 's/^.*waydroid-image 1://p')
+
+	if [[ "$CURRENT_VER" < "$REMOTE_VER" ]]; then
+	    echo Updating waydroid-image
+	    paru -S waydroid-image --config $REPO_DIR --noconfirm 
+	else
+	    echo "waydroid-image version ${CURRENT_VER} is up to date"
+	fi
+}
+
+gnome-shell_check() {
+	PKGBUILD_DIR=".cache/paru/clone/"
+	CLONE_URL="https://gitlab.archlinux.org/archlinux/packaging/packages/gnome-shell"
+	
+	# Sync database
+	paru -Sy --noconfirm > /dev/null 2>&1;
+	
+	# Check for the latest tag
+	REMOTE_VER=$(pacman -Ss gnome-shell | grep -m 1 -Eo '[0-9]+.[0-9]+-[0-9]')
+	CURRENT_VER=$(pacman -Q gnome-shell | sed -n -e 's/^.*gnome-shell 1://p')
+	
+	if [[ "$CURRENT_VER" < "$REMOTE_VER" ]]; then
+	    # echo "GNOME Shell version ${REMOTE_VER} found, updating"
+	    cd $HOME/$PKGBUILD_DIR
+
+	    # Remove current working dir if found
+	    if [ -d "gnome-shell" ]; then
+				rm -rf gnome-shell
+				git clone $CLONE_URL
+				cd gnome-shell
+			else
+				git clone $CLONE_URL
+				cd gnome-shell
+	    fi
+
+	    echo Patching PKGBUILD
+	    patch -Np1 -i $HOME/Documents/blurfix.patch
+
+	    echo Building GNOME Shell
+	    makepkg -si --noconfirm
+
+	    # echo "GNOME Shell version ${CURRENT_VER} is updated"
+	else
+	    echo "GNOME Shell version ${CURRENT_VER} is up to date"
+	fi
+}
+
+steamos_manager_check() {
+	PKGBUILD_DIR=".cache/paru/clone/steamos-manager"
+	
+	# Sync database
+	paru -Sy --noconfirm > /dev/null 2>&1;
+	
+	# Check for the latest tag
+	cd $HOME/$PKGBUILD_DIR/steamos-manager
+	local rev count
+	count="$(git rev-list --count HEAD)"
+	rev="$(git rev-parse --short HEAD)"
+	
+	REMOTE_VER=$(printf "0.r%s.g%s-1" "$count" "$rev")
+	CURRENT_VER=$(pacman -Q steamos-manager | sed -n -e 's/^.*steamos-manager //p')
+	
+	if [[ "$CURRENT_VER" < "$REMOTE_VER" ]]; then
+	    # echo "GNOME Shell version ${REMOTE_VER} found, updating"
+	    cd ../src/steamos-manager
+	    echo Building SteamOS Manager
+	    makepkg -si --noconfirm
+
+	    # echo "GNOME Shell version ${CURRENT_VER} is updated"
+	else
+	    echo "SteamOS Manager version ${CURRENT_VER} is up to date"
+	fi
+}
+
+
+update_all(){
+	# Update linux-cachyos
+	# kernel_check;
+
+	# Update Waydroid Image
+	# android_image_check;
+	
+	# Update SteamOS Manager
+	# steamos_manager_check;
+
+	# Update patched Gnome Shell
+	gnome-shell_check;
+
+	# Global update (AUR included)
+	until paru -Syu --noconfirm --overwrite "*" --nodeps; do sleep 1; done;
+	# arch-update
+
+	# Rebuild qadwaitadecorations
+	until paru -S qadwaitadecorations-qt6-git qadwaitadecorations-qt5-git --noconfirm; do sleep 1; done;
+
+	# Update gamescope
+	# paru -S gamescope-git gamescope-session-steam-git gamescope-session-git
+	# paru -S aur/gamescope-git aur/gamescope-session-git aur/gamescope-session-steam-git --noconfirm
+	# paru -S aur/gamescope-git aur/gamescope-session-git --noconfirm
+
+	# Update flatpak apps
+	flatpak update --noninteractive;
+	flatpak update --user --noninteractive;
+
+	# Cleanup
+	paru -Scc --noconfirm;
+	paru --clean --noconfirm;
+
+	# Choices
+	echo "Do you want to reboot?"
+	select yn in "Yes" "No"; do
+	    case $yn in
+				Yes ) sudo reboot; break;;
+				No ) exit;;
+	    esac
+	done
+}
+
+# More safety, by turning some bugs into errors.
+set -o errexit -o pipefail -o noclobber -o nounset
+
+# ignore errexit with `&& true`
+getopt --test > /dev/null && true
+if [[ $? -ne 4 ]]; then
+    echo 'I’m sorry, `getopt --test` failed in this environment.'
+    exit 1
+fi
+
+LONGOPTS=all,kernel,gnome-shell,android-image,steamos-manager
+OPTIONS=Akgas
+
+# -temporarily store output to be able to check for errors
+# -activate quoting/enhanced mode (e.g. by writing out “--options”)
+# -pass arguments only via   -- "$@"   to separate them correctly
+# -if getopt fails, it complains itself to stderr
+PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@") || exit 2
+# read getopt’s output this way to handle the quoting right:
+eval set -- "$PARSED"
+
+k=n A=n g=n	a=n s=n
+# now enjoy the options in order and nicely split until we see --
+while true; do
+    case "$1" in
+        -A|--all)
+            A=y
+            update_all
+            shift
+            break
+            ;;
+				-k|--kernel)
+			  			k=y
+            kernel_check
+            shift
+            break
+            ;;
+        -g|--gnome-shell)
+            g=y
+            gnome-shell_check
+            shift
+            break
+            ;;
+        -a|--android-image)
+            a=y
+            android_image_check
+            shift
+            break
+            ;;
+        -s|--steamos-manager)
+            s=y
+            steamos_manager_check
+            shift
+            break
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
+    esac
+done
+
+# handle non-option arguments
+if [[ $# -ne 1 ]]; then
+    echo "$0: A single input file is required."
+    exit 4
+fi
+
+# echo "all: $A, kernel: $k, gnome-shell: $g"

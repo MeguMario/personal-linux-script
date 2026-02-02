@@ -1,0 +1,164 @@
+#!/bin/bash
+
+light() {
+	# Get system accent color & color scheme
+	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
+	MODE="light"
+	
+	# Store previous settings into var
+	PREV_COLOR=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=dark).*(?=colors)' | sed -e 's/^.//;s/.$//')
+	PREV_COLOR6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=dark).*(?=colors)' | sed -e 's/^.//;s/.$//')
+	PREV_MODE=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=kde).*(?='$PREV_COLOR')' | sed -e 's/^.//;s/.$//')
+	PREV_MODE6=$(cat $HOME/.config/qt6ct/qt6ct.conf |  grep -o -P '(?<=kde).*(?='$PREV_COLOR6')' | sed -e 's/^.//;s/.$//')
+	
+	# Krita specific
+	PREV_KRTHEME=$(cat $HOME/.config/kritarc | grep -o -P '(?<=Theme=).*')
+	PREV_KDLTHEME=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorScheme=).*')
+	PREV_KDLTHEME_PATH=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorSchemePath=).*')
+	sed -i -e '0,/'"$PREV_KRTHEME"'/{s/'"$PREV_KRTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kritarc;
+	sed -i -e '0,/'"$PREV_KDLTHEME"'/{s/'"$PREV_KDLTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kdenliverc;
+	sed -i -e '0,/'"$PREV_KDLTHEME_PATH"'/{s/'"$PREV_KDLTHEME_PATH"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"''".colors"'/g}' $HOME/.config/kdenliverc;
+	
+	# Extensions settings
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview pipeline pipeline_78969828680812;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma 100;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 100;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel style-panel 1;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder style-dialogs 0;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline pipeline_78969828680812;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline pipeline_78969828680812;
+	gsettings reset org.gnome.shell.extensions.dash-to-dock background-color;
+	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.25;
+	
+	# Qt apps
+	kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1;
+	sudo kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1; 
+	sed -i -e '0,/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/{s/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt6ct/qt6ct.conf;
+	sed -i -e '0,/'"$PREV_MODE"'-'"$PREV_COLOR"'/{s/'"$PREV_MODE"'-'"$PREV_COLOR"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
+	
+ 	# GTK3 stuff
+	PREV_MODE_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-application-prefer-dark-theme=).*')
+	PREV_THEME_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-theme-name=).*')
+	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
+	
+	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"0"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	sed -i -e '0,/'"$PREV_THEME_GTK3"'/{s/'"$PREV_THEME_GTK3"'/'"$CURRENT_THEME_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	
+	# Duckstation appimage stuff
+	PREV_MODE_DSTATION=$(cat $HOME/.local/share/duckstation/settings.ini | grep -o -P '(?<=Theme = ).*')
+	sed -i -e '0,/'"$PREV_MODE_DSTATION"'/{s/'"$PREV_MODE_DSTATION"'/'"fusion"'/g}' $HOME/.local/share/duckstation/settings.ini;	
+
+	# Waydroid
+	sudo waydroid shell cmd uimode night no
+}
+
+dark() {
+	# Get system accent color & color scheme
+	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
+	MODE="dark"
+	
+	# Store previous settings into var
+	PREV_COLOR=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=light).*(?=colors)' | sed -e 's/^.//;s/.$//')
+	PREV_COLOR6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=light).*(?=colors)' | sed -e 's/^.//;s/.$//')
+	PREV_MODE=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=kde).*(?='$PREV_COLOR')' | sed -e 's/^.//;s/.$//')
+	PREV_MODE6=$(cat $HOME/.config/qt6ct/qt6ct.conf |  grep -o -P '(?<=kde).*(?='$PREV_COLOR6')' | sed -e 's/^.//;s/.$//')
+	
+	# Krita & Kdenlive specific
+	PREV_KRTHEME=$(cat $HOME/.config/kritarc | grep -o -P '(?<=Theme=).*')
+	PREV_KDLTHEME=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorScheme=).*')
+	PREV_KDLTHEME_PATH=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorSchemePath=).*')
+	sed -i -e '0,/'"$PREV_KRTHEME"'/{s/'"$PREV_KRTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kritarc;
+	sed -i -e '0,/'"$PREV_KDLTHEME"'/{s/'"$PREV_KDLTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kdenliverc;
+	sed -i -e '0,/'"$PREV_KDLTHEME_PATH"'/{s/'"$PREV_KDLTHEME_PATH"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"''".colors"'/g}' $HOME/.config/kdenliverc;
+
+	# Extensions settings
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview pipeline pipeline_default;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma 30;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 0.5;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 30;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel style-panel 0;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 1;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder style-dialogs 1;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline pipeline_default;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline pipeline_default;
+	gsettings set org.gnome.shell.extensions.dash-to-dock background-color '#000000';
+	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.5;
+	
+	# Qt apps
+	kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1; 
+	sudo kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1;
+	sed -i -e '0,/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/{s/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt6ct/qt6ct.conf;
+	sed -i -e '0,/'"$PREV_MODE"'-'"$PREV_COLOR"'/{s/'"$PREV_MODE"'-'"$PREV_COLOR"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
+
+ 	# GTK3 stuff
+	PREV_MODE_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-application-prefer-dark-theme=).*')
+	PREV_THEME_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-theme-name=).*')
+	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
+	
+	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"1"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	sed -i -e '0,/'"$PREV_THEME_GTK3"'/{s/'"$PREV_THEME_GTK3"'/'"$CURRENT_THEME_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	
+	# Duckstation appimage stuff
+	PREV_MODE_DSTATION=$(cat $HOME/.local/share/duckstation/settings.ini | grep -o -P '(?<=Theme = ).*')
+	sed -i -e '0,/'"$PREV_MODE_DSTATION"'/{s/'"$PREV_MODE_DSTATION"'/'"darkfusion"'/g}' $HOME/.local/share/duckstation/settings.ini;	
+	
+	# Waydroid
+	sudo waydroid shell cmd uimode night yes
+}
+# More safety, by turning some bugs into errors.
+set -o errexit -o pipefail -o noclobber -o nounset
+
+# ignore errexit with `&& true`
+getopt --test > /dev/null && true
+if [[ $? -ne 4 ]]; then
+    echo 'I’m sorry, `getopt --test` failed in this environment.'
+    exit 1
+fi
+
+LONGOPTS=dark,light
+OPTIONS=dl
+
+# -temporarily store output to be able to check for errors
+# -activate quoting/enhanced mode (e.g. by writing out “--options”)
+# -pass arguments only via   -- "$@"   to separate them correctly
+# -if getopt fails, it complains itself to stderr
+PARSED=$(getopt --options=$OPTIONS --longoptions=$LONGOPTS --name "$0" -- "$@") || exit 2
+# read getopt’s output this way to handle the quoting right:
+eval set -- "$PARSED"
+
+d=n l=n
+# now enjoy the options in order and nicely split until we see --
+while true; do
+    case "$1" in
+        -d|--dark)
+            d=y
+            dark
+            shift
+            break
+            ;;
+				-l|--light)
+			  			n=y
+            light
+            shift
+            break
+            ;;
+        --)
+            shift
+            break
+            ;;
+        *)
+            echo "Programming error"
+            exit 3
+            ;;
+    esac
+done
+
+# handle non-option arguments
+if [[ $# -ne 1 ]]; then
+    echo "$0: A single input file is required."
+    exit 4
+fi
+
+# echo "all: $A, kernel: $k, gnome-shell: $g"
