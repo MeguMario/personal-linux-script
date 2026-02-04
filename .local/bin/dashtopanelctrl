@@ -1,0 +1,15 @@
+#!/bin/bash
+
+con_monitors=$(gnome-randr | grep -c "logical monitor")
+ext_state=$(gnome-extensions info dash-to-panel@jderose9.github.com | grep -o -P '(?<=Enabled: ).*')
+
+if [[ $con_monitors > 1 ]]; then
+	if [[ $ext_state = "No" ]]; then
+		gnome-extensions enable dash-to-panel@jderose9.github.com
+	fi
+else
+  if [[ $ext_state = "Yes" ]]; then
+  		gnome-extensions disable dash-to-panel@jderose9.github.com
+  	fi
+fi
+
