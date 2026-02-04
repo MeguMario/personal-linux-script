@@ -1,0 +1,13 @@
+[Unit]
+Description=Dash to Panel on External screen
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/.local/bin/dashtopanelctrl
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=default.target
+
