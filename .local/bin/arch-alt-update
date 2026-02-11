@@ -16,7 +16,7 @@ kernel_check() {
 	    echo Updating Kernel
 	    paru -S linux-cachyos linux-cachyos-headers --config $REPO_DIR --noconfirm 
 
-			reboot_prompt
+		reboot_prompt
 	    # echo "linux-cachyos version ${REMOTE_VER} is updated"
 	else
 	    echo "linux-cachyos version ${CURRENT_VER} is up to date"
@@ -50,14 +50,13 @@ gnome-shell_check() {
 	    fi
 
 	    echo Patching PKGBUILD
-	    cp PKGBUILD PKGBUILD.tmp
-	    	sed -i 's@"git+https://gitlab.gnome.org/GNOME/libgnome-volume-control.git#commit=5f9768a2eac29c1ed56f1fbb449a77a3523683b6"@"https://github.com/user-attachments/files/22458817/Shell_BlurEffect__rounded_corners_mask.patch" "git+https://gitlab.gnome.org/GNOME/libgnome-volume-control.git#commit=5f9768a2eac29c1ed56f1fbb449a77a3523683b6"@g' PKGBUILD
-	    	sed -i  "s@'e31ae379039dfc345e8032f7b9803a59ded075fc52457ba1553276d3031e7025d9304a7f2167a01be2d54c5e121bae00a2824a9c5ccbf926865d0b24520bb053'@'3bcb9a4271376dba7b11a0d59d5fb1db70b395188c0584c473d652971bfbcad2bc6dfa5202ff90ba6fccea58f5d87829d87b449d9370e310fb8c6580778efe81' 'e31ae379039dfc345e8032f7b9803a59ded075fc52457ba1553276d3031e7025d9304a7f2167a01be2d54c5e121bae00a2824a9c5ccbf926865d0b24520bb053'@g" PKGBUILD
+	    sed -i 's@"git+https://gitlab.gnome.org/GNOME/libgnome-volume-control.git#commit=5f9768a2eac29c1ed56f1fbb449a77a3523683b6"@"https://github.com/user-attachments/files/22458817/Shell_BlurEffect__rounded_corners_mask.patch" "git+https://gitlab.gnome.org/GNOME/libgnome-volume-control.git#commit=5f9768a2eac29c1ed56f1fbb449a77a3523683b6"@g' PKGBUILD
+	    sed -i  "s@'e31ae379039dfc345e8032f7b9803a59ded075fc52457ba1553276d3031e7025d9304a7f2167a01be2d54c5e121bae00a2824a9c5ccbf926865d0b24520bb053'@'3bcb9a4271376dba7b11a0d59d5fb1db70b395188c0584c473d652971bfbcad2bc6dfa5202ff90ba6fccea58f5d87829d87b449d9370e310fb8c6580778efe81' 'e31ae379039dfc345e8032f7b9803a59ded075fc52457ba1553276d3031e7025d9304a7f2167a01be2d54c5e121bae00a2824a9c5ccbf926865d0b24520bb053'@g" PKGBUILD
 
 	    echo Building GNOME Shell
 	    makepkg -si --noconfirm
 
-			reboot_prompt
+		reboot_prompt
 	    # echo "GNOME Shell version ${CURRENT_VER} is updated"
 	else
 	    echo "GNOME Shell version ${CURRENT_VER} is up to date"
