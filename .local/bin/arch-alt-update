@@ -16,7 +16,6 @@ kernel_check() {
 	    echo Updating Kernel
 	    paru -S linux-cachyos linux-cachyos-headers --config $REPO_DIR --noconfirm 
 
-		reboot_prompt
 	    # echo "linux-cachyos version ${REMOTE_VER} is updated"
 	else
 	    echo "linux-cachyos version ${CURRENT_VER} is up to date"
@@ -57,7 +56,7 @@ gnome-shell_check() {
 	    echo Building GNOME Shell
 	    makepkg -si --noconfirm
 
-		reboot_prompt
+		sudo dconf update
 	    # echo "GNOME Shell version ${CURRENT_VER} is updated"
 	else
 	    echo "GNOME Shell version ${CURRENT_VER} is up to date"
