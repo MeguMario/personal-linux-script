@@ -1,6 +1,8 @@
 #!/bin/bash
 
 general_var(){
+	sleep 2 # Sleep first to wait for system to update
+
 	# Setting up variable for future use
 	# Gathering current system settings
 	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
@@ -85,7 +87,7 @@ set_theme(){
 	sed -i -e '0,/'"$PREV_ICON_THEME_QT5"'/{s/'"$PREV_ICON_THEME_QT5"'/'"$CURRENT_ICON_THEME_QT"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
 	
 	#GTK3
-	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"0"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"$CURRENT_MODE_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
 	sed -i -e '0,/'"$PREV_THEME_GTK3"'/{s/'"$PREV_THEME_GTK3"'/'"$CURRENT_THEME_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
 	
 	sed -i -e '0,/'"$PREV_THEME_DSTATION"'/{s/'"$PREV_THEME_DSTATION"'/'"$DSTATION_THEME"'/g}' $HOME/.local/share/duckstation/settings.ini; # Duckstation appimage stuff
