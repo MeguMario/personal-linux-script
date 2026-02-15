@@ -1,112 +1,99 @@
 #!/bin/bash
 
-light() {
-	# Get system accent color & color scheme
+general_var(){
+	# Setting up variable for future use
+	# Gathering current system settings
 	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
-	MODE="light"
-	
+	CURRENT_THEME_QT="libadwaita-kde-$MODE-$COLOR"
+	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
 	# Store previous settings into var
-	PREV_COLOR=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=dark).*(?=colors)' | sed -e 's/^.//;s/.$//')
-	PREV_COLOR6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=dark).*(?=colors)' | sed -e 's/^.//;s/.$//')
-	PREV_MODE=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=kde).*(?='$PREV_COLOR')' | sed -e 's/^.//;s/.$//')
-	PREV_MODE6=$(cat $HOME/.config/qt6ct/qt6ct.conf |  grep -o -P '(?<=kde).*(?='$PREV_COLOR6')' | sed -e 's/^.//;s/.$//')
-	
-	# Krita specific
-	PREV_KRTHEME=$(cat $HOME/.config/kritarc | grep -o -P '(?<=Theme=).*')
-	PREV_KDLTHEME=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorScheme=).*')
-	PREV_KDLTHEME_PATH=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorSchemePath=).*')
-	sed -i -e '0,/'"$PREV_KRTHEME"'/{s/'"$PREV_KRTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kritarc;
-	sed -i -e '0,/'"$PREV_KDLTHEME"'/{s/'"$PREV_KDLTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kdenliverc;
-	sed -i -e '0,/'"$PREV_KDLTHEME_PATH"'/{s/'"$PREV_KDLTHEME_PATH"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"''".colors"'/g}' $HOME/.config/kdenliverc;
-	
-	# Extensions settings
-	gsettings set org.gnome.shell.extensions.blur-my-shell.overview pipeline pipeline_78969828680812;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma 100;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 1;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 100;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel style-panel 1;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 0;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder style-dialogs 0;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline pipeline_78969828680812;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline pipeline_78969828680812;
-	gsettings reset org.gnome.shell.extensions.dash-to-dock background-color;
-	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.25;
-	
-	# Qt apps
-	kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1;
-	sudo kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1; 
-	sed -i -e '0,/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/{s/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt6ct/qt6ct.conf;
-	sed -i -e '0,/'"$PREV_MODE"'-'"$PREV_COLOR"'/{s/'"$PREV_MODE"'-'"$PREV_COLOR"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
-	
- 	# GTK3 stuff
+	PREV_THEME_QT5=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=color_scheme_path=).*')
+	PREV_THEME_QT6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=color_scheme_path=).*')
 	PREV_MODE_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-application-prefer-dark-theme=).*')
 	PREV_THEME_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-theme-name=).*')
-	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
-	
-	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"0"'/g}' $HOME/.config/gtk-3.0/settings.ini;
-	sed -i -e '0,/'"$PREV_THEME_GTK3"'/{s/'"$PREV_THEME_GTK3"'/'"$CURRENT_THEME_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
-	
-	# Duckstation appimage stuff
-	PREV_MODE_DSTATION=$(cat $HOME/.local/share/duckstation/settings.ini | grep -o -P '(?<=Theme = ).*')
-	sed -i -e '0,/'"$PREV_MODE_DSTATION"'/{s/'"$PREV_MODE_DSTATION"'/'"fusion"'/g}' $HOME/.local/share/duckstation/settings.ini;	
+	# Store previous Krita theme settings
+	PREV_KRTHEME=$(cat $HOME/.config/kritarc | grep -o -P '(?<=Theme=).*')
+	# Store previous Kdenlive theme settings
+	PREV_KDLTHEME=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorScheme=).*')
+	PREV_KDLTHEME_PATH=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorSchemePath=).*')
+	# Ducstation current settings
+	PREV_THEME_DSTATION=$(cat $HOME/.local/share/duckstation/settings.ini | grep -o -P '(?<=Theme = ).*')
+}
 
-	# Waydroid
-	sudo waydroid shell cmd uimode night no
+light() {
+	MODE="light" # Light mode variable
+
+	general_var # Get those var
+
+	# Blur My Shell settings
+	BMS_PIPELINE="pipeline_7896982868081"
+	BMS_SIGMA="100"
+	BMS_BRIGHTNESS="1"
+	BMS_STYLE="0"
+	BMS_STYLE_PANEL="1"
+	BMS_BACKGROUND_COLOR="#000000" # This one went unused for light mode.
+	BMS_BACKGROUND_OPACITY="0.25"
+
+	set_theme # Finally set the theme
 }
 
 dark() {
-	# Get system accent color & color scheme
-	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
-	MODE="dark"
-	
-	# Store previous settings into var
-	PREV_COLOR=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=light).*(?=colors)' | sed -e 's/^.//;s/.$//')
-	PREV_COLOR6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=light).*(?=colors)' | sed -e 's/^.//;s/.$//')
-	PREV_MODE=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=kde).*(?='$PREV_COLOR')' | sed -e 's/^.//;s/.$//')
-	PREV_MODE6=$(cat $HOME/.config/qt6ct/qt6ct.conf |  grep -o -P '(?<=kde).*(?='$PREV_COLOR6')' | sed -e 's/^.//;s/.$//')
-	
-	# Krita & Kdenlive specific
-	PREV_KRTHEME=$(cat $HOME/.config/kritarc | grep -o -P '(?<=Theme=).*')
-	PREV_KDLTHEME=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorScheme=).*')
-	PREV_KDLTHEME_PATH=$(cat $HOME/.config/kdenliverc | grep -o -P '(?<=ColorSchemePath=).*')
-	sed -i -e '0,/'"$PREV_KRTHEME"'/{s/'"$PREV_KRTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kritarc;
-	sed -i -e '0,/'"$PREV_KDLTHEME"'/{s/'"$PREV_KDLTHEME"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/kdenliverc;
-	sed -i -e '0,/'"$PREV_KDLTHEME_PATH"'/{s/'"$PREV_KDLTHEME_PATH"'/'"libadwaita-kde"'-'"$MODE"'-'"$COLOR"''".colors"'/g}' $HOME/.config/kdenliverc;
+	MODE="dark" # Light mode variable
 
-	# Extensions settings
-	gsettings set org.gnome.shell.extensions.blur-my-shell.overview pipeline pipeline_default;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma 30;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness 0.5;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma 30;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.panel style-panel 0;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components 1;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder style-dialogs 1;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline pipeline_default;
-	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline pipeline_default;
-	gsettings set org.gnome.shell.extensions.dash-to-dock background-color '#000000';
-	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity 0.5;
+	general_var # Get those var
+
+	# Blur My Shell settings
+	BMS_PIPELINE="pipeline_default"
+	BMS_SIGMA="30"
+	BMS_BRIGHTNESS="0.5"
+	BMS_STYLE="0"
+	BMS_STYLE_PANEL="1"
+	BMS_BACKGROUND_COLOR="#000000" # This one went used for dark mode.
+	BMS_BACKGROUND_OPACITY="0.5"
 	
+	set_theme # Finally set the theme
+}
+
+set_theme(){
+	sed -i -e '0,/'"$PREV_THEME_KRITA"'/{s/'"$PREV_THEME_KRITA"'/'"$CURRENT_THEME_QT"'/g}' $HOME/.config/kritarc; # Krita stuff
+
+	# Kdenlive stuff
+	sed -i -e '0,/'"$PREV_THEME_KDL"'/{s/'"$PREV_THEME_KDL"'/'"$CURRENT_THEME_QT"'/g}' $HOME/.config/kdenliverc;
+	sed -i -e '0,/'"$PREV_THEME_KDL_PATH"'/{s/'"$PREV_THEME_KDL_PATH"'/'"$CURRENT_THEME_QT"'.colors/g}' $HOME/.config/kdenliverc;
+
 	# Qt apps
-	kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1; 
-	sudo kvantummanager --set libadwaita-kde-$MODE-$COLOR > /dev/null 2>&1;
-	sed -i -e '0,/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/{s/'"$PREV_MODE6"'-'"$PREV_COLOR6"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt6ct/qt6ct.conf;
-	sed -i -e '0,/'"$PREV_MODE"'-'"$PREV_COLOR"'/{s/'"$PREV_MODE"'-'"$PREV_COLOR"'/'"$MODE"'-'"$COLOR"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
-
- 	# GTK3 stuff
-	PREV_MODE_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-application-prefer-dark-theme=).*')
-	PREV_THEME_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-theme-name=).*')
-	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
+	kvantummanager --set $CURRENT_THEME_QT > /dev/null 2>&1;
+	sudo kvantummanager --set $CURRENT_THEME_QT > /dev/null 2>&1; 
+	sed -i -e '0,/'"$PREV_THEME_QT6"'/{s/'"$PREV_THEME_QT6"'/'"$CURRENT_THEME_QT"'.colors/g}' $HOME/.config/qt6ct/qt6ct.conf;
+	sed -i -e '0,/'"$PREV_THEME_QT5"'/{s/'"$PREV_THEME_QT5"'/'"$CURRENT_THEME_QT"'.colors/g}' $HOME/.config/qt5ct/qt5ct.conf;
 	
-	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"1"'/g}' $HOME/.config/gtk-3.0/settings.ini;
+	#GTK3
+	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"0"'/g}' $HOME/.config/gtk-3.0/settings.ini;
 	sed -i -e '0,/'"$PREV_THEME_GTK3"'/{s/'"$PREV_THEME_GTK3"'/'"$CURRENT_THEME_GTK3"'/g}' $HOME/.config/gtk-3.0/settings.ini;
 	
-	# Duckstation appimage stuff
-	PREV_MODE_DSTATION=$(cat $HOME/.local/share/duckstation/settings.ini | grep -o -P '(?<=Theme = ).*')
-	sed -i -e '0,/'"$PREV_MODE_DSTATION"'/{s/'"$PREV_MODE_DSTATION"'/'"darkfusion"'/g}' $HOME/.local/share/duckstation/settings.ini;	
-	
-	# Waydroid
-	sudo waydroid shell cmd uimode night yes
+	sed -i -e '0,/'"$PREV_MODE_DSTATION"'/{s/'"$PREV_MODE_DSTATION"'/'"fusion"'/g}' $HOME/.local/share/duckstation/settings.ini; # Duckstation appimage stuff
+
+	# Extensions settings
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview pipeline $BMS_PIPELINE;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.dash-to-dock sigma $BMS_SIGMA;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel brightness $BMS_BRIGHTNESS;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel sigma $BMS_SIGMA;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.panel style-panel $BMS_STYLE_PANEL;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.overview style-components $BMS_STYLE;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.appfolder style-dialogs $BMS_STYLE;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline $BMS_PIPELINE;
+	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline $BMS_PIPELINE;
+	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity $BMS_BACKGROUND_OPACITY;
+
+	if [[ "$MODE" != "dark" ]]; then
+		gsettings set org.gnome.shell.extensions.dash-to-dock background-color $BMS_BACKGROUND_COLOR; # Extensions settings
+		sudo waydroid shell cmd uimode night yes # Waydroid settings
+	else
+		gsettings reset org.gnome.shell.extensions.dash-to-dock background-color; # Extensions settings
+		sudo waydroid shell cmd uimode night no # Waydroid settings
+	fi
 }
+
 # More safety, by turning some bugs into errors.
 set -o errexit -o pipefail -o noclobber -o nounset
 
@@ -138,8 +125,8 @@ while true; do
             shift
             break
             ;;
-				-l|--light)
-			  			n=y
+			-l|--light)
+			n=y
             light
             shift
             break

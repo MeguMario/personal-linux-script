@@ -1,7 +1,7 @@
 #!/bin/bash
 
 kernel_check() {
-	REPO_DIR="${HOME}/cachyos_repo/cachyos-repo/pacman.conf"
+	REPO_DIR="${HOME}/.cachyos_repo/cachyos-repo/pacman.conf"
 	
 	# Sync database
 	paru -Sy --config $REPO_DIR --noconfirm > /dev/null 2>&1;
@@ -63,15 +63,6 @@ gnome-shell_check() {
 }
 
 update_all(){
-	# Update linux-cachyos
-	# kernel_check;
-
-	# Update Waydroid Image
-	# android_image_check;
-	
-	# Update SteamOS Manager
-	# steamos_manager_check;
-
 	# Update patched Gnome Shell
 	gnome-shell_check;
 
@@ -80,12 +71,7 @@ update_all(){
 	# arch-update
 
 	# Rebuild qadwaitadecorations
-	until paru -S qadwaitadecorations-qt6-git qadwaitadecorations-qt5-git --noconfirm; do sleep 1; done;
-
-	# Update gamescope
-	# paru -S gamescope-git gamescope-session-steam-git gamescope-session-git
-	# paru -S aur/gamescope-git aur/gamescope-session-git aur/gamescope-session-steam-git --noconfirm
-	# paru -S aur/gamescope-git aur/gamescope-session-git --noconfirm
+	until paru -S qadwaitadecorations-qt6-git qadwaitadecorations-qt5-git --rebuild --noconfirm; do sleep 1; done;
 
 	# Update flatpak apps
 	flatpak update --noninteractive;
@@ -140,8 +126,8 @@ while true; do
             shift
             break
             ;;
-				-k|--kernel)
-			  			k=y
+		-k|--kernel)
+			k=y
             kernel_check
             shift
             break
