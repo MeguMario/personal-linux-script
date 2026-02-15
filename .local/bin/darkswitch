@@ -7,6 +7,7 @@ general_var(){
 	CURRENT_THEME_QT="libadwaita-kde-$MODE-$COLOR"
 	CURRENT_THEME_GTK3=$(gsettings get org.gnome.desktop.interface gtk-theme)
 	THEME_PATH_QT="/usr/share/color-schemes/"
+	ICON_THEME_QT="breeze"
 	# Store previous settings into var
 	PREV_THEME_QT5=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=color_scheme_path=).*')
 	PREV_THEME_QT6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=color_scheme_path=).*')
@@ -26,6 +27,8 @@ general_var(){
 light() {
 	MODE="light" # Light mode variable
 
+	general_var # Get those var
+
 	# Blur My Shell settings
 	BMS_PIPELINE="pipeline_78969828680812"
 	BMS_SIGMA="100"
@@ -36,7 +39,7 @@ light() {
 	BMS_BACKGROUND_OPACITY="0.25"
 
 	CURRENT_MODE_GTK3="0" # GTK3 light mode
-	CURRENT_ICON_THEME_QT="breeze" # Icon theme for qt apps
+	CURRENT_ICON_THEME_QT=$ICON_THEME_QT # Icon theme for qt apps
 
 	DSTATION_THEME="fusion" # Duckstation
 
@@ -45,6 +48,8 @@ light() {
 
 dark() {
 	MODE="dark" # Light mode variable
+
+	general_var # Get those var
 
 	# Blur My Shell settings
 	BMS_PIPELINE="pipeline_default"
@@ -56,7 +61,7 @@ dark() {
 	BMS_BACKGROUND_OPACITY="0.5"
 
 	CURRENT_MODE_GTK3="1" # GTK3 dark mode
-	CURRENT_ICON_THEME_QT="breeze-$MODE" # Icon theme for qt apps
+	CURRENT_ICON_THEME_QT=$ICON_THEME_QT"-"$MODE # Icon theme for qt apps
 	
 	DSTATION_THEME="darkfusion" # Duckstation
 
@@ -64,8 +69,6 @@ dark() {
 }
 
 set_theme(){
-	general_var # Get those var
-
 	sed -i -e '0,/'"$PREV_THEME_KRITA"'/{s/'"$PREV_THEME_KRITA"'/'"$CURRENT_THEME_QT"'/g}' $HOME/.config/kritarc; # Krita stuff
 
 	# Kdenlive stuff
