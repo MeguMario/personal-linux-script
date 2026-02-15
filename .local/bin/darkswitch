@@ -10,6 +10,8 @@ general_var(){
 	# Store previous settings into var
 	PREV_THEME_QT5=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=color_scheme_path=).*')
 	PREV_THEME_QT6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=color_scheme_path=).*')
+	PREV_ICON_THEME_QT5=$(cat $HOME/.config/qt5ct/qt5ct.conf | grep -o -P '(?<=icon_theme=).*')
+	PREV_ICON_THEME_QT6=$(cat $HOME/.config/qt6ct/qt6ct.conf | grep -o -P '(?<=icon_theme=).*')
 	PREV_MODE_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-application-prefer-dark-theme=).*')
 	PREV_THEME_GTK3=$(cat $HOME/.config/gtk-3.0/settings.ini | grep -o -P '(?<=gtk-theme-name=).*')
 	# Store previous Krita theme settings
@@ -33,6 +35,9 @@ light() {
 	BMS_BACKGROUND_COLOR="#000000" # This one went unused for light mode.
 	BMS_BACKGROUND_OPACITY="0.25"
 
+	CURRENT_MODE_GTK3="0" # GTK3 light mode
+	CURRENT_ICON_THEME_QT="breeze" # Icon theme for qt apps
+
 	DSTATION_THEME="fusion" # Duckstation
 
 	set_theme # Finally set the theme
@@ -49,6 +54,9 @@ dark() {
 	BMS_STYLE_PANEL="0"
 	BMS_BACKGROUND_COLOR="#000000" # This one went used for dark mode.
 	BMS_BACKGROUND_OPACITY="0.5"
+
+	CURRENT_MODE_GTK3="1" # GTK3 dark mode
+	CURRENT_ICON_THEME_QT="breeze-$MODE" # Icon theme for qt apps
 	
 	DSTATION_THEME="darkfusion" # Duckstation
 
@@ -69,6 +77,9 @@ set_theme(){
 	sudo kvantummanager --set $CURRENT_THEME_QT > /dev/null 2>&1; 
 	sed -i -e '0,\@'"$PREV_THEME_QT6"'@{s@'"$PREV_THEME_QT6"'@'"$THEME_PATH_QT"''"$CURRENT_THEME_QT"'.colors@g}' $HOME/.config/qt6ct/qt6ct.conf;
 	sed -i -e '0,\@'"$PREV_THEME_QT5"'@{s@'"$PREV_THEME_QT5"'@'"$THEME_PATH_QT"''"$CURRENT_THEME_QT"'.colors@g}' $HOME/.config/qt5ct/qt5ct.conf;
+	# Set icon theme  for qt apps
+	sed -i -e '0,/'"$PREV_ICON_THEME_QT6"'/{s/'"$PREV_ICON_THEME_QT6"'/'"$CURRENT_ICON_THEME_QT"'/g}' $HOME/.config/qt6ct/qt6ct.conf;
+	sed -i -e '0,/'"$PREV_ICON_THEME_QT5"'/{s/'"$PREV_ICON_THEME_QT5"'/'"$CURRENT_ICON_THEME_QT"'/g}' $HOME/.config/qt5ct/qt5ct.conf;
 	
 	#GTK3
 	sed -i -e '0,/'"$PREV_MODE_GTK3"'/{s/'"$PREV_MODE_GTK3"'/'"0"'/g}' $HOME/.config/gtk-3.0/settings.ini;
