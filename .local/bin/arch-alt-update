@@ -56,8 +56,6 @@ gnome-shell_check() {
 
 	    echo Building GNOME Shell
 	    makepkg -si --noconfirm
-
-			sudo dconf update
 	    # echo "GNOME Shell version ${CURRENT_VER} is updated"
 	else
 	    echo "GNOME Shell version ${CURRENT_VER} is up to date"
