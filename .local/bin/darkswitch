@@ -1,7 +1,7 @@
 #!/bin/bash
 
 general_var(){
-	sleep 2 # Sleep first to wait for system to update
+	sleep 0.5 # Sleep first to wait for system to update
 	
 	# Setting up variable for future use
 	# Gathering current system settings
