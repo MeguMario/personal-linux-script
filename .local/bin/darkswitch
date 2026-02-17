@@ -2,7 +2,7 @@
 
 general_var(){
 	sleep 2 # Sleep first to wait for system to update
-
+	
 	# Setting up variable for future use
 	# Gathering current system settings
 	COLOR=$(gsettings get org.gnome.desktop.interface accent-color | sed -e 's/"//g' -e "s/'//g" -e 's/ //g')
@@ -35,7 +35,7 @@ light() {
 	BMS_PIPELINE="pipeline_78969828680812"
 	BMS_SIGMA="100"
 	BMS_BRIGHTNESS="1"
-	BMS_STYLE="2"
+	BMS_STYLE="0"
 	BMS_STYLE_PANEL="1"
 	BMS_BACKGROUND_COLOR="#000000" # This one went unused for light mode.
 	BMS_BACKGROUND_OPACITY="0.25"
