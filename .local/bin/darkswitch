@@ -35,7 +35,7 @@ light() {
 	BMS_PIPELINE="pipeline_78969828680812"
 	BMS_SIGMA="100"
 	BMS_BRIGHTNESS="1"
-	BMS_STYLE="0"
+	BMS_STYLE="2"
 	BMS_STYLE_PANEL="1"
 	BMS_BACKGROUND_COLOR="#000000" # This one went unused for light mode.
 	BMS_BACKGROUND_OPACITY="0.25"
@@ -57,7 +57,7 @@ dark() {
 	BMS_PIPELINE="pipeline_default"
 	BMS_SIGMA="30"
 	BMS_BRIGHTNESS="0.5"
-	BMS_STYLE="1"
+	BMS_STYLE="2"
 	BMS_STYLE_PANEL="0"
 	BMS_BACKGROUND_COLOR="#000000" # This one went used for dark mode.
 	BMS_BACKGROUND_OPACITY="0.5"
