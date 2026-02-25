@@ -49,7 +49,7 @@ gnome-shell_check() {
 	    fi
 
 	    echo Patching PKGBUILD
-	    sed -i "s@"'source=('"@"'source=(\n	"https://github.com/user-attachments/files/22458817/Shell_BlurEffect__rounded_corners_mask.patch"'"@g" PKGBUILD
+	    sed -i "s@"'source=('"@"'source=(\n	"Shell_BlurEffect__rounded_corners_mask.patch::https://aur.archlinux.org/cgit/aur.git/plain/Shell_BlurEffect__rounded_corners_mask.patch?h=gnome-shell-rounded-blur"'"@g" PKGBUILD
 	    sed -i "s@"'b2sums=('"@"'b2sums=('"'3bcb9a4271376dba7b11a0d59d5fb1db70b395188c0584c473d652971bfbcad2bc6dfa5202ff90ba6fccea58f5d87829d87b449d9370e310fb8c6580778efe81'\n	@g" PKGBUILD
 	    sed -i "s@cd "'$pkgbase'"@cd "'$pkgbase'"\n	patch -Np1 -i ../Shell_BlurEffect__rounded_corners_mask.patch@g" PKGBUILD
 
