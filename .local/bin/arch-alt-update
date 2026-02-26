@@ -22,6 +22,7 @@ kernel_check() {
 	fi
 }
 
+# Deprecated, blur component is now externally managed.
 gnome-shell_check() {
 	PKGBUILD_DIR="/tmp"
 	CLONE_URL="https://gitlab.archlinux.org/archlinux/packaging/packages/gnome-shell"
@@ -62,9 +63,6 @@ gnome-shell_check() {
 }
 
 update_all(){
-	# Update patched Gnome Shell
-	gnome-shell_check;
-
 	# Global update (AUR included)
 	until paru -Syu --noconfirm --overwrite "*" --nodeps; do sleep 1; done;
 	# arch-update
