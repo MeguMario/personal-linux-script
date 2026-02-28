@@ -106,9 +106,11 @@ set_theme(){
 
 	if [[ "$MODE" = "dark" ]]; then
 		gsettings set org.gnome.shell.extensions.dash-to-dock background-color $BMS_BACKGROUND_COLOR; # Extensions settings
+		gnome-extensions enable panel-color-matcher@otsaloma.io # Reenable the extension
 		sudo waydroid shell cmd uimode night yes # Waydroid settings
 	else
 		gsettings reset org.gnome.shell.extensions.dash-to-dock background-color; # Extensions settings
+		gnome-extensions disable panel-color-matcher@otsaloma.io # Disable Panel color matcher due to incompatibility with Luminous
 		sudo waydroid shell cmd uimode night no # Waydroid settings
 	fi
 }
