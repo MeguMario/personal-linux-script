@@ -11,6 +11,10 @@ Handling Dark/Light mode switching on GNOME for qt/KDE apps, apps that need spec
 
 This automate system update on Arch Linux alongside updating the [patched version of GNOME](https://github.com/aunetx/blur-my-shell/issues/594) that I have in addition to rebuilding [qadwaitadecorations](https://github.com/FedoraQt/QAdwaitaDecorations) with every system update and cleaning up pacman once update is finished
 
-## dashtopanelctrl
+## hidetopvarctrl
 
-Enable Dash to Panel on External Display, besure to edit the service file to your username and set Dash to Panel to only show on External Display before enabling.
+Disable Hide top bar when an external display is connected
+
+## psswitchscript
+
+Disable Blur effect on battery saver

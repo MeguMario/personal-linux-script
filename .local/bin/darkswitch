@@ -39,6 +39,8 @@ light() {
 	BMS_STYLE_PANEL="0"
 	BMS_BACKGROUND_COLOR="#000000" # This one went unused for light mode.
 	BMS_BACKGROUND_OPACITY="0.25"
+	GRADIENT="['rgba(255,255,255,0.25)', 'rgba(0,0,0,0)']"
+	RGB="rgb(240,240,240)"
 
 	CURRENT_MODE_GTK3="0" # GTK3 light mode
 	CURRENT_ICON_THEME_QT=$ICON_THEME_QT # Icon theme for qt apps
@@ -57,10 +59,12 @@ dark() {
 	BMS_PIPELINE="pipeline_default"
 	BMS_SIGMA="30"
 	BMS_BRIGHTNESS="0.5"
-	BMS_STYLE="1"
+	BMS_STYLE="2"
 	BMS_STYLE_PANEL="0"
 	BMS_BACKGROUND_COLOR="#000000" # This one went used for dark mode.
 	BMS_BACKGROUND_OPACITY="0.5"
+	GRADIENT="['rgba(0,0,0,0.5)', 'rgba(0,0,0,0)']"
+	RGB="rgb(0,0,0)"
 
 	CURRENT_MODE_GTK3="1" # GTK3 dark mode
 	CURRENT_ICON_THEME_QT=$ICON_THEME_QT"-"$MODE # Icon theme for qt apps
@@ -103,14 +107,16 @@ set_theme(){
 	gsettings set org.gnome.shell.extensions.blur-my-shell.screenshot pipeline $BMS_PIPELINE;
 	gsettings set org.gnome.shell.extensions.blur-my-shell.coverflow-alt-tab pipeline $BMS_PIPELINE;
 	gsettings set org.gnome.shell.extensions.dash-to-dock background-opacity $BMS_BACKGROUND_OPACITY;
+	gsettings set org.gnome.shell.extensions.org.pshow.gradienttopbar colors "$GRADIENT";
+	gsettings set org.gnome.shell.extensions.panel-corners panel-corner-background-color "$RGB";
 
 	if [[ "$MODE" = "dark" ]]; then
 		gsettings set org.gnome.shell.extensions.dash-to-dock background-color $BMS_BACKGROUND_COLOR; # Extensions settings
-		gnome-extensions enable panel-color-matcher@otsaloma.io # Reenable the extension
+		#gnome-extensions enable panel-color-matcher@otsaloma.io # Reenable the extension
 		sudo waydroid shell cmd uimode night yes # Waydroid settings
 	else
 		gsettings reset org.gnome.shell.extensions.dash-to-dock background-color; # Extensions settings
-		gnome-extensions disable panel-color-matcher@otsaloma.io # Disable Panel color matcher due to incompatibility with Luminous
+		#gnome-extensions disable panel-color-matcher@otsaloma.io # Disable Panel color matcher due to incompatibility with Luminous
 		sudo waydroid shell cmd uimode night no # Waydroid settings
 	fi
 }
@@ -170,3 +176,4 @@ if [[ $# -ne 1 ]]; then
 fi
 
 # echo "all: $A, kernel: $k, gnome-shell: $g"
+

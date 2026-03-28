@@ -1,0 +1,13 @@
+[Unit]
+Description=Turn off certain extensions & option on power saving
+After=graphical.target
+
+[Service]
+Type=simple
+ExecStart=/home/user/.local/bin/psswitchscript
+Restart=always
+RestartSec=10s
+
+[Install]
+WantedBy=default.target
+

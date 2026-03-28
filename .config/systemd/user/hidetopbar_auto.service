@@ -4,7 +4,7 @@ After=graphical.target
 
 [Service]
 Type=simple
-ExecStart=/home/user/.local/bin/dashtopanelctrl
+ExecStart=/home/user/.local/bin/hidetopbarctrl
 Restart=always
 RestartSec=10s
 

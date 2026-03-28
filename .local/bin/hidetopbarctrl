@@ -1,0 +1,13 @@
+#!/bin/bash
+
+con_monitors=$(gnome-randr | grep -c "logical monitor")
+ext_state=$(gnome-extensions info hidetopbar@mathieu.bidon.ca | grep -o -P '(?<=Enabled: ).*')
+
+if [[ $ext_state = "Yes" ]]; then
+	if [[ $con_monitors > 1 ]]; then
+			gnome-extensions disable hidetopbar@mathieu.bidon.ca
+	else
+			gnome-extensions enable hidetopbar@mathieu.bidon.ca
+	fi
+fi
+
