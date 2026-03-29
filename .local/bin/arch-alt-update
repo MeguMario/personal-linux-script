@@ -68,8 +68,8 @@ update_all(){
 	until paru -Syu --noconfirm --overwrite "*" --nodeps; do sleep 1; done;
 	# arch-update
 
-	# Rebuild qadwaitadecorations
-	until paru -S qadwaitadecorations-qt6-git qadwaitadecorations-qt5-git --rebuild --noconfirm; do sleep 1; done;
+	# Rebuild qadwaitadecorations and qt*ct
+	until paru -S qadwaitadecorations-qt6-git qadwaitadecorations-qt5-git qt6ct-kde qt5ct-kde --rebuild --noconfirm; do sleep 1; done;
 
 	# Update flatpak apps
 	flatpak update --noninteractive;

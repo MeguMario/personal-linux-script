@@ -42,13 +42,13 @@ if [[ $ppd_state != $ppd_current_state ]]; then
 	echo $ppd_state > "$CONF_FILE"
 	case $ppd_state in
 		powersave | performance)
-			off
-		  ;;
+		off
+		;;
 		balanced-battery | balanced)
-			on
-		  ;;
+		on
+		;;
 		*)
-		  echo -n "unknown"
-		  ;;
+		echo -n "unknown"
+		;;
 	esac
 fi
